@@ -34,8 +34,8 @@ moveObject (WorldObject p objectAngle a) movementAngle timeDelta speed =
             timeDelta * speed
 
         newPosition =
-            { x = p.x + speedFactor * uCircleP.x
-            , y = p.y + speedFactor * uCircleP.y
+            { x = max 0 (min World.width (p.x + speedFactor * uCircleP.x))
+            , y = max 0 (min World.height (p.y + speedFactor * uCircleP.y))
             }
     in
     WorldObject newPosition objectAngle a
@@ -71,4 +71,4 @@ rotateClockwise (WorldObject p angle a) timeDelta speed =
 
 inBounds : WorldObject a -> Bool
 inBounds (WorldObject p dir a) =
-    p.x >= 0 && p.x <= World.width && p.y >= 0 && p.y <= World.height
+    p.x > 0 && p.x < World.width && p.y > 0 && p.y < World.height
