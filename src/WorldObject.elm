@@ -72,3 +72,9 @@ rotateClockwise (WorldObject p angle a) timeDelta speed =
 inBounds : WorldObject a -> Bool
 inBounds (WorldObject p dir a) =
     p.x > 0 && p.x < World.width && p.y > 0 && p.y < World.height
+
+
+isColliding : WorldObject a -> WorldObject b -> Bool
+isColliding (WorldObject pa _ _) (WorldObject pb _ _) =
+    -- WorldObject needs a size
+    False

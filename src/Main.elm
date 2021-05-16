@@ -34,7 +34,7 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd msg )
 init _ =
-    ( { tankA = WorldObject { x = 0, y = World.height / 2 - tankHeight / 2 } (Degrees 0) { hp = 100 }
+    ( { tankA = WorldObject { x = tankWidth, y = World.height / 2 - tankHeight / 2 } (Degrees 0) { hp = 100 }
       , tankB = WorldObject { x = World.width - tankWidth, y = World.height / 2 - tankHeight / 2 } (Degrees 180) { hp = 100 }
       , projectiles = []
       , currentMovement = Nothing
@@ -150,6 +150,15 @@ removeOutOfBoundsProjectiles model =
     { model | projectiles = List.filter WorldObject.inBounds model.projectiles }
 
 
+projectileCollisions : Model -> Model
+projectileCollisions model =
+    let
+        projectilesCollidingTankA =
+            List.filter (WorldObject.isColliding model.tankA) model.projectiles
+    in
+    { model | projectiles = model.projectiles, tankA = model.tankA, tankB = model.tankB }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -157,6 +166,7 @@ update msg model =
             ( moveTank d model
                 |> moveProjectiles d
                 |> removeOutOfBoundsProjectiles
+                |> projectileCollisions
             , Cmd.none
             )
 
@@ -214,33 +224,55 @@ tankView (WorldObject position direction tank) =
         , style "border" "1px solid darkgreen"
         , style "background" "green"
         , style "position" "absolute"
-        , style "top" (String.fromFloat position.y ++ "px")
-        , style "left" (String.fromFloat position.x ++ "px")
+        , style "top" (String.fromFloat (position.y - tankHeight / 2) ++ "px")
+        , style "left" (String.fromFloat (position.x - tankWidth / 2) ++ "px")
         , style "transform" ("rotate(" ++ String.fromInt (Angle.toDegrees direction) ++ "deg)")
         ]
         [ div
-            [ style "background" "green"
+            [ style "background" "darkgreen"
             , style "border" "1px solid darkgreen"
-            , style "width" (String.fromInt tankWidth ++ "px")
+            , style "width" (String.fromInt (tankWidth / 2 |> round) ++ "px")
             , style "height" "10px"
             , style "position" "absolute"
-            , style "top" "20px"
-            , style "left" "25px"
+            , style "top" (String.fromFloat (tankHeight / 2 - 10 / 2) ++ "px")
+            , style "left" "15px"
+            ]
+            []
+        , let
+            turretSize =
+                tankWidth / 2
+          in
+          div
+            [ style "background" "darkgreen"
+            , style "height" (String.fromFloat turretSize ++ "px")
+            , style "width" (String.fromFloat turretSize ++ "px")
+            , style "border-radius" (String.fromFloat turretSize ++ "px")
+            , style "position" "absolute"
+            , style "top" (String.fromFloat (tankHeight / 2 - turretSize / 2) ++ "px")
+            , style "left" (String.fromFloat (tankWidth / 2 - turretSize / 2 - 4) ++ "px")
             ]
             []
         ]
 
 
+projectileHeight =
+    14
+
+
+projectileWidth =
+    14
+
+
 projectileView : WorldObject Projectile -> Html Msg
 projectileView (WorldObject position direction p) =
     div
-        [ style "width" "20px"
-        , style "height" "20px"
-        , style "border-radius" "20px"
+        [ style "width" (String.fromInt projectileWidth ++ "px")
+        , style "height" (String.fromInt projectileHeight ++ "px")
+        , style "border-radius" (String.fromInt projectileHeight ++ "px")
         , style "background" "black"
         , style "position" "absolute"
-        , style "top" (String.fromFloat position.y ++ "px")
-        , style "left" (String.fromFloat position.x ++ "px")
+        , style "top" (String.fromFloat (position.y - projectileHeight / 2) ++ "px")
+        , style "left" (String.fromFloat (position.x - projectileWidth / 2) ++ "px")
         ]
         []
 
