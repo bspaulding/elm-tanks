@@ -2,10 +2,16 @@ module WorldObject exposing (..)
 
 import Angle exposing (..)
 import Position exposing (..)
+import World
 
 
 type WorldObject a
     = WorldObject Position Angle a
+
+
+position : WorldObject a -> Position
+position (WorldObject p dir a) =
+    p
 
 
 direction : WorldObject a -> Angle
@@ -19,7 +25,7 @@ updateDirection (WorldObject p _ a) d =
 
 
 moveObject : WorldObject a -> Angle -> Float -> Float -> WorldObject a
-moveObject (WorldObject position objectAngle a) movementAngle timeDelta speed =
+moveObject (WorldObject p objectAngle a) movementAngle timeDelta speed =
     let
         uCircleP =
             Angle.unitCirclePosition movementAngle
@@ -28,15 +34,15 @@ moveObject (WorldObject position objectAngle a) movementAngle timeDelta speed =
             timeDelta * speed
 
         newPosition =
-            { x = position.x + speedFactor * uCircleP.x
-            , y = position.y + speedFactor * uCircleP.y
+            { x = p.x + speedFactor * uCircleP.x
+            , y = p.y + speedFactor * uCircleP.y
             }
     in
     WorldObject newPosition objectAngle a
 
 
 rotateAnticlockwise : WorldObject a -> Float -> Float -> WorldObject a
-rotateAnticlockwise (WorldObject position angle a) timeDelta speed =
+rotateAnticlockwise (WorldObject p angle a) timeDelta speed =
     let
         speedFactor =
             timeDelta * speed
@@ -46,11 +52,11 @@ rotateAnticlockwise (WorldObject position angle a) timeDelta speed =
                 - speedFactor
                 |> round
     in
-    WorldObject position (Degrees newAngle) a
+    WorldObject p (Degrees newAngle) a
 
 
 rotateClockwise : WorldObject a -> Float -> Float -> WorldObject a
-rotateClockwise (WorldObject position angle a) timeDelta speed =
+rotateClockwise (WorldObject p angle a) timeDelta speed =
     let
         speedFactor =
             timeDelta * speed
@@ -60,4 +66,9 @@ rotateClockwise (WorldObject position angle a) timeDelta speed =
                 + speedFactor
                 |> round
     in
-    WorldObject position (Degrees newAngle) a
+    WorldObject p (Degrees newAngle) a
+
+
+inBounds : WorldObject a -> Bool
+inBounds (WorldObject p dir a) =
+    p.x >= 0 && p.x <= World.width && p.y >= 0 && p.y <= World.height
