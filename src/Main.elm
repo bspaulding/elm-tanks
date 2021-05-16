@@ -155,8 +155,23 @@ projectileCollisions model =
     let
         projectilesCollidingTankA =
             List.filter (WorldObject.isColliding model.tankA) model.projectiles
+
+        projectilesCollidingTankB =
+            Debug.log "projectilesCollidingTankB: " <| List.filter (WorldObject.isColliding model.tankB) model.projectiles
+
+        allCollidingProjectiles =
+            projectilesCollidingTankB
+
+        projectiles =
+            List.filter (\p -> not <| List.member p allCollidingProjectiles) model.projectiles
+
+        damageToTankB =
+            List.sum (List.map (WorldObject.get .damage) projectilesCollidingTankB)
+
+        newTankB =
+            WorldObject.updateObject model.tankB (\tankB -> { tankB | hp = tankB.hp - damageToTankB })
     in
-    { model | projectiles = model.projectiles, tankA = model.tankA, tankB = model.tankB }
+    { model | projectiles = projectiles, tankA = model.tankA, tankB = newTankB }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -229,6 +244,14 @@ tankView (WorldObject position direction size tank) =
         , style "transform" ("rotate(" ++ String.fromInt (Angle.toDegrees direction) ++ "deg)")
         ]
         [ div
+            [ style "position" "absolute"
+            , style "top" "-20px"
+            , style "left" "6px"
+            , style "font-size" "14px"
+            , style "font-weight" "normal"
+            ]
+            [ text (String.fromInt tank.hp ++ "hp") ]
+        , div
             [ style "background" "darkgreen"
             , style "border" "1px solid darkgreen"
             , style "width" (String.fromInt (size.width / 2 |> round) ++ "px")
