@@ -34,8 +34,8 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd msg )
 init _ =
-    ( { tankA = WorldObject { x = tankWidth, y = World.height / 2 - tankHeight / 2 } (Degrees 0) { hp = 100 }
-      , tankB = WorldObject { x = World.width - tankWidth, y = World.height / 2 - tankHeight / 2 } (Degrees 180) { hp = 100 }
+    ( { tankA = WorldObject { x = tankWidth, y = World.height / 2 - tankHeight / 2 } (Degrees 0) { width = tankWidth, height = tankHeight } { hp = 100 }
+      , tankB = WorldObject { x = World.width - tankWidth, y = World.height / 2 - tankHeight / 2 } (Degrees 180) { width = tankWidth, height = tankHeight } { hp = 100 }
       , projectiles = []
       , currentMovement = Nothing
       }
@@ -100,7 +100,7 @@ handleKeyCommand model kcmd =
 
 newProjectile : Position -> Angle -> WorldObject Projectile
 newProjectile p dir =
-    WorldObject p dir { damage = 10 }
+    WorldObject p dir { width = projectileWidth, height = projectileHeight } { damage = 10 }
 
 
 projectileSpeed =
@@ -217,30 +217,30 @@ tankHeight =
 
 
 tankView : WorldObject Tank -> Html Msg
-tankView (WorldObject position direction tank) =
+tankView (WorldObject position direction size tank) =
     div
-        [ style "height" (String.fromInt tankWidth ++ "px")
-        , style "width" (String.fromInt tankHeight ++ "px")
+        [ style "height" (String.fromFloat size.height ++ "px")
+        , style "width" (String.fromFloat size.width ++ "px")
         , style "border" "1px solid darkgreen"
         , style "background" "green"
         , style "position" "absolute"
-        , style "top" (String.fromFloat (position.y - tankHeight / 2) ++ "px")
-        , style "left" (String.fromFloat (position.x - tankWidth / 2) ++ "px")
+        , style "top" (String.fromFloat (position.y - size.height / 2) ++ "px")
+        , style "left" (String.fromFloat (position.x - size.width / 2) ++ "px")
         , style "transform" ("rotate(" ++ String.fromInt (Angle.toDegrees direction) ++ "deg)")
         ]
         [ div
             [ style "background" "darkgreen"
             , style "border" "1px solid darkgreen"
-            , style "width" (String.fromInt (tankWidth / 2 |> round) ++ "px")
+            , style "width" (String.fromInt (size.width / 2 |> round) ++ "px")
             , style "height" "10px"
             , style "position" "absolute"
-            , style "top" (String.fromFloat (tankHeight / 2 - 10 / 2) ++ "px")
+            , style "top" (String.fromFloat (size.height / 2 - 10 / 2) ++ "px")
             , style "left" "15px"
             ]
             []
         , let
             turretSize =
-                tankWidth / 2
+                size.width / 2
           in
           div
             [ style "background" "darkgreen"
@@ -248,8 +248,8 @@ tankView (WorldObject position direction tank) =
             , style "width" (String.fromFloat turretSize ++ "px")
             , style "border-radius" (String.fromFloat turretSize ++ "px")
             , style "position" "absolute"
-            , style "top" (String.fromFloat (tankHeight / 2 - turretSize / 2) ++ "px")
-            , style "left" (String.fromFloat (tankWidth / 2 - turretSize / 2 - 4) ++ "px")
+            , style "top" (String.fromFloat (size.height / 2 - turretSize / 2) ++ "px")
+            , style "left" (String.fromFloat (size.width / 2 - turretSize / 2 - 4) ++ "px")
             ]
             []
         ]
@@ -264,15 +264,15 @@ projectileWidth =
 
 
 projectileView : WorldObject Projectile -> Html Msg
-projectileView (WorldObject position direction p) =
+projectileView (WorldObject position direction size p) =
     div
-        [ style "width" (String.fromInt projectileWidth ++ "px")
-        , style "height" (String.fromInt projectileHeight ++ "px")
-        , style "border-radius" (String.fromInt projectileHeight ++ "px")
+        [ style "width" (String.fromFloat size.width ++ "px")
+        , style "height" (String.fromFloat size.height ++ "px")
+        , style "border-radius" (String.fromFloat size.width ++ "px")
         , style "background" "black"
         , style "position" "absolute"
-        , style "top" (String.fromFloat (position.y - projectileHeight / 2) ++ "px")
-        , style "left" (String.fromFloat (position.x - projectileWidth / 2) ++ "px")
+        , style "top" (String.fromFloat (position.y - size.height / 2) ++ "px")
+        , style "left" (String.fromFloat (position.x - size.width / 2) ++ "px")
         ]
         []
 
