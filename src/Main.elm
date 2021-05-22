@@ -157,10 +157,10 @@ projectileCollisions model =
             List.filter (WorldObject.isColliding model.tankA) model.projectiles
 
         projectilesCollidingTankB =
-            Debug.log "projectilesCollidingTankB: " <| List.filter (WorldObject.isColliding model.tankB) model.projectiles
+            List.filter (WorldObject.isColliding model.tankB) model.projectiles
 
         allCollidingProjectiles =
-            projectilesCollidingTankB
+            projectilesCollidingTankA ++ projectilesCollidingTankB
 
         projectiles =
             List.filter (\p -> not <| List.member p allCollidingProjectiles) model.projectiles
